@@ -1,0 +1,29 @@
+include "/etc/global-proxy/*.nft"
+
+table inet global_proxy {
+    set v4_private_ips {
+        type ipv4_addr
+        flags constant, interval
+        elements = { 0.0.0.0/8, 127.0.0.0/8 }
+    }
+
+    set v6_private_ips {
+        type ipv6_addr
+        flags constant, interval
+        elements = { ::/128, ::1/128 }
+    }
+
+    chain output_loop {
+        ip daddr @v4_private_ips return
+        ip6 daddr @v6_private_ips return
+        meta mark set $MARK
+    }
+
+    chain prerouting {
+        type filter hook prerouting priority mangle
+        meta iifname != lo return
+        meta mark != $MARK return
+        meta nfproto ipv4 meta l4proto { tcp, udp } tproxy ip to $V4_TPROXY_ADDR:$V4_TPROXY_PORT
+        meta nfproto ipv6 meta l4proto { tcp, udp } tproxy ip6 to $V6_TPROXY_ADDR:$V6_TPROXY_PORT
+    }
+}

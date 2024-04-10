@@ -1,0 +1,11 @@
+table inet test {
+    chain input {
+        type filter hook input priority filter; policy accept;
+        ct state new log prefix "Input: "
+    }
+
+    chain output {
+        type filter hook output priority filter; policy accept;
+        ct state new log prefix "Output: "
+    }
+}

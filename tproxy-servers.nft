@@ -1,0 +1,4 @@
+define V4_TPROXY_ADDR = 127.0.0.1
+define V4_TPROXY_PORT = 1082
+define V6_TPROXY_ADDR = ::1
+define V6_TPROXY_PORT = 1082
