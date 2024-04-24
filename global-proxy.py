@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# PYTHON_ARGCOMPLETE_OK
 
 import pwd, sys
 from argparse import ArgumentParser, BooleanOptionalAction
@@ -10,8 +11,6 @@ from pyroute2 import IPRoute
 FWMARK = 2333
 TABLE_ID = 233
 
-nft = Nftables()
-
 
 def run_nft_cmd(cmd: str, ignore_error: bool = False):
     rc, output, error = nft.cmd(cmd)
@@ -22,7 +21,6 @@ def run_nft_cmd(cmd: str, ignore_error: bool = False):
 
 
 def add_or_del_ip_route(command: str):
-    ipr = IPRoute()
     lo = ipr.link_lookup(ifname='lo')[0]
     for family in AF_INET, AF_INET6:
         ipr.route(command, family=family, type='local', oif=lo, table=TABLE_ID, scope='host')
@@ -100,8 +98,18 @@ if __name__ == '__main__':
     parser_disable.add_argument('user', help='uid / username of the user')
     parser_disable.set_defaults(func=disable)
 
+    try:
+        import argcomplete
+        argcomplete.autocomplete(parser)
+    except:
+        pass
+
     args = parser.parse_args()
     func = args.func
     args = vars(args)
     args.pop('func')
+
+    nft = Nftables()
+    ipr = IPRoute()
+
     func(**args)

@@ -13,6 +13,9 @@ depends=(
   python
   python-pyroute2
 )
+optdepends=(
+  python-argcomplete
+)
 
 package() {
   install -Dm755 global-proxy.py "${pkgdir}/usr/bin/global-proxy"
